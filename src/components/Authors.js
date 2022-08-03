@@ -1,8 +1,13 @@
+import EditAuthor from "./EditAuthor";
+
 const Authors = (props) => {
   if (!props.show) {
-    return null
+    return null;
   }
-  const authors = []
+
+  if (props.authors.loading) {
+    return <div>loading...</div>;
+  }
 
   return (
     <div>
@@ -14,7 +19,7 @@ const Authors = (props) => {
             <th>born</th>
             <th>books</th>
           </tr>
-          {authors.map((a) => (
+          {props.authors.data.allAuthors.map((a) => (
             <tr key={a.name}>
               <td>{a.name}</td>
               <td>{a.born}</td>
@@ -23,8 +28,9 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
+      <EditAuthor authors={props.authors.data.allAuthors} />
     </div>
-  )
-}
+  );
+};
 
-export default Authors
+export default Authors;
