@@ -18,7 +18,6 @@ const App = () => {
   const [favGenre, setFavGenre] = useState(null);
 
   const authors = useQuery(QUERIES.ALL_AUTHORS);
-  const books = useQuery(QUERIES.ALL_BOOKS);
 
   const client = useApolloClient();
 
@@ -61,15 +60,11 @@ const App = () => {
 
       <Authors show={page === "authors"} authors={authors} />
 
-      <Books show={page === "books"} books={books} />
+      <Books show={page === "books"} />
 
-      <NewBook show={page === "add"} />
+      <NewBook show={page === "add"} setError={setErrorMessage} />
 
-      <Recommendation
-        show={page === "recommended"}
-        books={books}
-        favGenre={favGenre}
-      />
+      <Recommendation show={page === "recommended"} favGenre={favGenre} />
     </div>
   );
 };

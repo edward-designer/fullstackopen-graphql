@@ -14,7 +14,11 @@ const NewBook = (props) => {
     refetchQueries: [
       { query: QUERIES.ALL_BOOKS },
       { query: QUERIES.ALL_AUTHORS },
+      { query: QUERIES.ALL_BOOKS_BY_GENRES },
     ],
+    onError: (error) => {
+      props.setError(error.graphQLErrors[0].message);
+    },
   });
 
   if (!props.show) {

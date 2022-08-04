@@ -4,9 +4,15 @@ import { useQuery } from "@apollo/client";
 
 import QUERIES from "../util/gql";
 
-const Recommendation = ({ show, books }) => {
+const Recommendation = ({ show }) => {
   const ME = useQuery(QUERIES.GET_ME);
-  console.log(books.data.allBooks);
+  const favGenre = ME.data?.me.favoriteGenre;
+
+  const books = useQuery(QUERIES.ALL_BOOKS_BY_GENRES, {
+    variables: { genres: favGenre },
+    skip: !favGenre,
+  });
+
   if (!show) return null;
   return (
     <div>
@@ -18,15 +24,13 @@ const Recommendation = ({ show, books }) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {books.data.allBooks
-            .filter((book) => book.genres.includes(ME.data.me.favoriteGenre))
-            .map((a) => (
-              <tr key={a.title}>
-                <td>{a.title}</td>
-                <td>{a.author.name}</td>
-                <td>{a.published}</td>
-              </tr>
-            ))}
+          {books.data.allBooks.map((a) => (
+            <tr key={a.title}>
+              <td>{a.title}</td>
+              <td>{a.author.name}</td>
+              <td>{a.published}</td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </div>

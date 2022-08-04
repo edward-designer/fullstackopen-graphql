@@ -34,6 +34,19 @@ const ALL_BOOKS = gql`
   }
 `;
 
+const ALL_BOOKS_BY_GENRES = gql`
+  query AllBooks($genres: String) {
+    allBooks(genres: $genres) {
+      title
+      published
+      author {
+        name
+      }
+      genres
+    }
+  }
+`;
+
 const ADD_BOOK = gql`
   mutation AddBook(
     $title: String!
@@ -77,6 +90,7 @@ const LOGIN = gql`
 const GQL = {
   ALL_AUTHORS,
   ALL_BOOKS,
+  ALL_BOOKS_BY_GENRES,
   GET_ME,
   ADD_BOOK,
   SET_AUTHOR_BIRTH_YEAR,
