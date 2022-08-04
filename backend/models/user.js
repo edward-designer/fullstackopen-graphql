@@ -6,11 +6,10 @@ const schema = new mongoose.Schema({
     required: true,
     minlength: 3,
   },
-  genre: [
-    {
-      type: String,
-    },
-  ],
+  favoriteGenre: {
+    type: String,
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("User", schema);

@@ -40,7 +40,9 @@ const EditAuthor = ({ authors }) => {
       <label hmtlfor="name">Name</label>
       <select id="name" value={name} onChange={handleNameChange}>
         {authors.map((author) => (
-          <option value={author.name}>{author.name}</option>
+          <option value={author.name} key={author.name}>
+            {author.name}
+          </option>
         ))}
       </select>
       <br />

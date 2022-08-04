@@ -75,7 +75,7 @@ const resolvers = {
     authorCount: async () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
       if (!args.author && !args.genres) {
-        return Book.find({});
+        return Book.find({}).populate("author");
       }
       if (args.genres) {
         return Book.find({ genres: args.genres });
@@ -88,8 +88,10 @@ const resolvers = {
     allAuthors: async () => Author.find({}),
   },
   Author: {
-    bookCount: async (root) =>
-      Book.find({ author: root.name }).countDocuments(),
+    bookCount: async (root) => {
+      const author = await Author.findOne({ name: root.name });
+      return Book.count({ author: author });
+    },
   },
   Mutation: {
     createUser: async (root, args) => {
@@ -171,6 +173,7 @@ const server = new ApolloServer({
     if (auth && auth.toLowerCase().startsWith("bearer")) {
       const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET);
       const currentUser = await User.findById(decodedToken.id);
+      console.log(currentUser);
       return { currentUser };
     }
   },
