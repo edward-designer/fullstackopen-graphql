@@ -27,12 +27,26 @@ const resolvers = {
         return Book.find({ author: author });
       }
     },
-    allAuthors: async () => Author.find({}),
-  },
-  Author: {
-    bookCount: async (root) => {
-      const author = await Author.findOne({ name: root.name });
-      return Book.count({ author: author });
+    allAuthors: async () => {
+      const updatedAuthor = await Author.aggregate([
+        {
+          $project: {
+            id: "$_id",
+            name: 1,
+            born: 1,
+            booksWritten: 1,
+            bookCount: {
+              $cond: {
+                if: { $isArray: "$booksWritten" },
+                then: { $size: "$booksWritten" },
+                else: 0,
+              },
+            },
+          },
+        },
+      ]);
+      await Book.populate(updatedAuthor, { path: "booksWritten" });
+      return updatedAuthor; // don't know why cannot populate bookswritten
     },
   },
   Mutation: {
@@ -67,7 +81,16 @@ const resolvers = {
 
       let author = await Author.findOne({ name: args.author });
       if (!author) {
-        author = new Author({ name: args.author });
+        author = new Author({ name: args.author, booksWritten: book });
+        try {
+          await author.save();
+        } catch (error) {
+          throw new UserInputError(error.message, {
+            invalidArgs: args,
+          });
+        }
+      } else {
+        author.booksWritten = [...author.booksWritten, book];
         try {
           await author.save();
         } catch (error) {
