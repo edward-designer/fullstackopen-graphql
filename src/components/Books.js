@@ -6,9 +6,9 @@ import QUERIES from "../util/gql";
 const Books = (props) => {
   const [genres, setGenres] = useState("all genres");
   const allBooks = useQuery(QUERIES.ALL_BOOKS);
+
   const books = useQuery(QUERIES.ALL_BOOKS_BY_GENRES, {
     variables: { genres },
-    skip: !genres || genres === "all genres",
   });
 
   if (!props.show) {

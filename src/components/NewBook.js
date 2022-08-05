@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
+import { useMutation, useSubscription } from "@apollo/client";
 
 import QUERIES from "../util/gql";
 
@@ -10,11 +10,29 @@ const NewBook = (props) => {
   const [genre, setGenre] = useState("");
   const [genres, setGenres] = useState([]);
 
+  useSubscription(QUERIES.BOOK_ADDED, {
+    onSubscriptionData: ({ subscriptionData }) => {
+      const addedBook = subscriptionData.data.bookAdded;
+      props.setError(`${addedBook.title} added`);
+      props.client.cache.updateQuery(
+        { query: QUERIES.ALL_BOOKS },
+        ({ allBooks }) => {
+          return {
+            allBooks: allBooks.concat(addedBook),
+          };
+        }
+      );
+    },
+  });
+
   const [addBook] = useMutation(QUERIES.ADD_BOOK, {
-    refetchQueries: [
+    refetchQueries: (result) => [
       { query: QUERIES.ALL_BOOKS },
       { query: QUERIES.ALL_AUTHORS },
-      { query: QUERIES.ALL_BOOKS_BY_GENRES },
+      {
+        query: QUERIES.ALL_BOOKS_BY_GENRES,
+        variables: { genres: result.genres[0] }, //cannot make queries with variables to work
+      },
     ],
     onError: (error) => {
       props.setError(error.graphQLErrors[0].message);
